@@ -1,19 +1,7 @@
 <template>
   <div>
-    <div class="container">
-        <Logo>
-          <li v-for="item in messages">
-            {{ item }}
-          </li>
-        </Logo>
-        <div class="my-container">
-          <div class="backdrop">
-            <HighlightText
-              class="my-highlight"
-              highlightClassName="highlight"
-              :queries="list"
-            >{{text}}</HighlightText>
-          </div>
+    
+    <div class="jumbotron jumbotron-fluid" >
 
           <b-form-textarea
             type="text"
@@ -21,37 +9,36 @@
             class="myForm"
             id="textarea"
             v-model.trim="text"
+            row="6"
+            col="6"
             placeholder="Enter something..."
-            rows="6"
-            cols="6"
             @keyup.enter="sendMessage()"
           ></b-form-textarea>
-          
-          <div
-            class="suggest-list"
-            :style="{top: top + 'em', left: left + 'em'}"
-          >
-            <scrollBar class="wrap" barYMinHeight="3" :scrollTrackStyle="scrollTrackStyle">
-              <b-list-group>
-                <b-list-group-item
-                  class="suggest-word"
-                  v-for="(item, index) in list"
-                  :key="index"
-                  @click="chooseWord(item)"
-                >{{item}}</b-list-group-item>
-              </b-list-group>
-            </scrollBar>
-            <div>
-              <button class="btn btn-success" type="button" @click="sendMessage()" >Basic</button>
-            </div>
+
+          <ul class="list-group list-group-horizontal" >
+            <li class="list-group-item" v-for="(item, index) in list" :key="index">{{ item }}</li>
+          </ul>
+
+          <div>
+            <button class="btn btn-success" type="button" @click="sendMessage()" >Send Message</button>
           </div>
-        </div>
+        
     </div>
+
+    <Logo>
+      <li v-for="(item,index) in messages" :key="index">
+        {{ item }}
+        </li>
+    </Logo>
+    
   </div>
+
+
 </template>
 
 <script>
 import Logo from "~/components/Logo.vue";
+import { mapState, mapActions } from "vuex";
 var _ = require('lodash');
 
 export default {
@@ -68,41 +55,32 @@ export default {
       scrollTrackStyle: {
         backgroundColor: "white"
       },
-      top: 2,
+      top: 3,
       left: 0
     };
   },
   watch: {
     text: function() {
       this.list = [];
-      this.startCursor = this.text.length - 1;
       this.getSuggest();
     }
   },
   computed: {
-   
+   ...mapState("sugesstMessage", ["listSuggest"]),
   },
 
   methods: {
+    ...mapActions("sugesstMessage", ["getSuggest"]),
     sendMessage() {
       
       this.messages.push(this.text);
       this.text = "";
     },
-    chooseWord(item) {
-      if(!_.endsWith(this.text,' ')) {
-        this.text = this.text + " " + item
-        this.$refs.form.focus();
-      } else {
-        this.text = this.text + item
-        this.$refs.form.focus();
-      }
-    },
     getSuggest: _.debounce(
-      function() {
+      async function() {
         //
         this.left = 0.45 * (this.startCursor % 135);
-        this.top = 2 + this.startCursor / 135;
+        this.top = 3 + this.startCursor / 135;
         //
         if (this.text == ""){
           this.list = []
@@ -117,10 +95,15 @@ export default {
         var textInput;
         if (endPosition === -1 ) {
           textInput = this.text;
+          // await this.getSuggest(textInput);
+          // this.list = this.listSuggest;
+
           this.list= ["hieuoc", "ngusi", "danhdon","haha"]
         }
         else {
           textInput = this.text.slice(endPosition + 1);
+          // await this.getSuggest(textInput);
+          // this.list = this.listSuggest;
           this.list= ["fifa", "ngu", "vl"]
         }
         
@@ -137,35 +120,9 @@ export default {
 </script>
 
 <style>
-.my-container {
-  position: relative;
-}
-
-.my-container .backdrop {
-  display: block;
-  position: absolute;
-  left: 0.8em;
-  top: 0.4em;
-  color: transparent;
-  background-color: transparent;
-  font-size: 1em;
-  white-space: pre-wrap;
-  /* z-index: 1; */
-}
-
-.my-container .myForm {
-  display: inline-block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: black;
-  /* color: transparent; */
-  background-color: transparent;
-  font: 1em sans-serif;
-  line-height: 1.45em;
-  /* z-index: 1; */
-  letter-spacing: 0;
-  word-spacing: normal;
+.container {
+  margin-left: 5em;
+  margin-right: 5em; 
 }
 
 .my-highlight,
@@ -198,12 +155,12 @@ export default {
 }
 
 .suggest-word:hover {
-  height: 2em;
+  height: 3em;
   background-color: rgb(82, 255, 189);
 }
 
 .wrap {
-  height: 6em;
+  height: 7em;
   width: 8em;
 }
 </style>
