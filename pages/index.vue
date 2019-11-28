@@ -9,8 +9,6 @@
             class="myForm"
             id="textarea"
             v-model.trim="text"
-            row="6"
-            col="6"
             placeholder="Enter something..."
             @keyup.enter="sendMessage()"
           ></b-form-textarea>
@@ -25,15 +23,13 @@
         
     </div>
 
-    <Logo>
-      <li v-for="(item,index) in messages" :key="index">
-        {{ item }}
-        </li>
-    </Logo>
+    <h3>Messages</h3>
+    <div v-for="(message,index) in messages" :key="index" class="container" >
+      <p>{{message.text}}</p>
+      <span class="time-right">{{message.time}}</span>
+    </div>
     
   </div>
-
-
 </template>
 
 <script>
@@ -49,38 +45,35 @@ export default {
     return {
       isMounted: false,
       messages: [],
+      //isMessage: false,
       text: "",
-      startCursor: 0,
       list: [],
-      scrollTrackStyle: {
-        backgroundColor: "white"
-      },
-      top: 3,
-      left: 0
+      
     };
   },
   watch: {
     text: function() {
       this.list = [];
-      this.getSuggest();
+      //this.getSuggest();
     }
   },
   computed: {
-   ...mapState("sugesstMessage", ["listSuggest"]),
+   //...mapState("sugesstMessage", ["listSuggest"]),
   },
 
   methods: {
-    ...mapActions("sugesstMessage", ["getSuggest"]),
+    //...mapActions("sugesstMessage", ["getSuggest"]),
     sendMessage() {
-      
-      this.messages.push(this.text);
+      let m = {};
+      let date = Date();
+      let time = date.substring(16,25);
+      m.text = this.text;
+      m.time = time;
+      this.messages.push(m);
       this.text = "";
     },
     getSuggest: _.debounce(
       async function() {
-        //
-        this.left = 0.45 * (this.startCursor % 135);
-        this.top = 3 + this.startCursor / 135;
         //
         if (this.text == ""){
           this.list = []
@@ -92,21 +85,35 @@ export default {
             return
           }
         var endPosition = Number(this.text.lastIndexOf('.'));
-        var textInput;
+        var textInput = "";
         if (endPosition === -1 ) {
           textInput = this.text;
-          // await this.getSuggest(textInput);
-          // this.list = this.listSuggest;
 
-          this.list= ["hieuoc", "ngusi", "danhdon","haha"]
+          axios.post(`https://localhost:3000/`, textInput)
+            .then( res => {
+              console.log(res);
+              //this.list = res
+            }
+          ).catch(err => {
+              console.log(err)
+            }
+          );
+          this.list= ["0", "1", "2","3"]
         }
         else {
           textInput = this.text.slice(endPosition + 1);
-          // await this.getSuggest(textInput);
-          // this.list = this.listSuggest;
-          this.list= ["fifa", "ngu", "vl"]
+          
+          axios.post(`https://localhost:3000/`, textInput)
+            .then( res => {
+              console.log(res);
+              //this.list = res
+            }
+          ).catch(err => {
+              console.log(err)
+            }
+          );
+          this.list= ["4", "5", "6","8"]
         }
-        
         
       },
       // Đây là thời gian (đơn vị mili giây) chúng ta đợi người dùng dừng gõ.
@@ -120,12 +127,37 @@ export default {
 </script>
 
 <style>
+
 .container {
-  margin-left: 5em;
-  margin-right: 5em; 
+  border: 1px solid #dedede;
+  background-color: #f1f1f1;
+  border-radius: 3px;
+  padding: 3px;
+  margin: 5px 0;
 }
 
-.my-highlight,
+.darker {
+  border-color: #ccc;
+  background-color: #ddd;
+}
+
+.container::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.time-right {
+  float: right;
+  color: #aaa;
+}
+
+.time-left {
+  float: left;
+  color: #999;
+}
+/* */
+/* .my-highlight,
 .my-highlight * {
   padding: 0;
   margin: 0;
@@ -162,5 +194,5 @@ export default {
 .wrap {
   height: 7em;
   width: 8em;
-}
+} */
 </style>
