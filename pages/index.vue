@@ -89,7 +89,7 @@ export default {
         if (endPosition === -1 ) {
           textInput = this.text;
 
-          axios.post(`https://localhost:3000/`, textInput)
+          axios.post(`https://localhost:5000/`, textInput)
             .then( res => {
               console.log(res);
               //this.list = res
@@ -103,7 +103,7 @@ export default {
         else {
           textInput = this.text.slice(endPosition + 1);
           
-          axios.post(`https://localhost:3000/`, textInput)
+          axios.post(`https://localhost:5000/`, textInput)
             .then( res => {
               console.log(res);
               //this.list = res
