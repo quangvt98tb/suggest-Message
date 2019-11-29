@@ -36,6 +36,7 @@
 import Logo from "~/components/Logo.vue";
 import { mapState, mapActions } from "vuex";
 var _ = require('lodash');
+const axios = require('axios');
 
 export default {
   components: {
@@ -54,15 +55,15 @@ export default {
   watch: {
     text: function() {
       this.list = [];
-      //this.getSuggest();
+      this.getSuggest();
     }
   },
   computed: {
-   //...mapState("sugesstMessage", ["listSuggest"]),
+   ...mapState("sugesstMessage", ["listSuggest"]),
   },
 
   methods: {
-    //...mapActions("sugesstMessage", ["getSuggest"]),
+    ...mapActions("sugesstMessage", ["getSuggestM"]),
     sendMessage() {
       let m = {};
       let date = Date();
@@ -75,6 +76,7 @@ export default {
     getSuggest: _.debounce(
       async function() {
         //
+        console.log(1);
         if (this.text == ""){
           this.list = []
           return 
@@ -85,39 +87,56 @@ export default {
             return
           }
         var endPosition = Number(this.text.lastIndexOf('.'));
-        var textInput = "";
+        
         if (endPosition === -1 ) {
-          textInput = this.text;
-
-          axios.post(`https://localhost:5000/`, textInput)
+        
+          let textInput = {
+            "sentence": this.text
+          }
+          let jsonObj = JSON.stringify(textInput)
+         
+          
+          // const qs = require('qs');
+          // console.log(2,qs.stringify(textInput))
+          axios.post('http://192.168.0.109:8890/api', 
+            jsonObj
+            // ,
+            // {
+            //   headers: {
+            //       'Content-Type': 'application/x-www-form-urlencoded'
+            //   },
+            //   dataType: "json"
+            // }
+            )
             .then( res => {
+              console.log("response")
               console.log(res);
-              //this.list = res
+              
             }
-          ).catch(err => {
-              console.log(err)
-            }
-          );
-          this.list= ["0", "1", "2","3"]
+            ).catch(err => {
+                console.log("error")
+                console.log(err)
+              }
+            );
         }
         else {
           textInput = this.text.slice(endPosition + 1);
           
-          axios.post(`https://localhost:5000/`, textInput)
+          axios.post(`https://192.168.0.109:8890/api`, textInput)
             .then( res => {
               console.log(res);
-              //this.list = res
+              this.list = res
             }
-          ).catch(err => {
-              console.log(err)
-            }
-          );
-          this.list= ["4", "5", "6","8"]
+            ).catch(err => {
+                console.log(err)
+              }
+            );
+         
         }
         
       },
       // Đây là thời gian (đơn vị mili giây) chúng ta đợi người dùng dừng gõ.
-      2000
+      3000
     )
   },
   mounted() {
