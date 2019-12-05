@@ -1,6 +1,6 @@
 <template>
   <div>
-    
+
     <div class="jumbotron jumbotron-fluid" >
 
           <b-form-textarea
@@ -8,19 +8,28 @@
             ref="form"
             class="myForm"
             id="textarea"
-            v-model.trim="text"
+            v-model="text"
             placeholder="Enter something..."
             @keyup.enter="sendMessage()"
           ></b-form-textarea>
 
-          <ul class="list-group list-group-horizontal" >
-            <li class="list-group-item" v-for="(item, index) in list" :key="index">{{ item }}</li>
-          </ul>
+          <b-tooltip
+            target="textarea"
+            template=""
+            html="true">
+              <button
+                class="list-group-item list-group-item-action active"
+                style="background-color:transparent;border:0"
+                v-for="(item, index) in list" :key="index"
+                @click="appendText(item)">
+                {{ item }}
+              </button>
+          </b-tooltip>
 
           <div>
             <button class="btn btn-success" type="button" @click="sendMessage()" >Send Message</button>
           </div>
-        
+
     </div>
 
     <h3>Messages</h3>
@@ -28,7 +37,7 @@
       <p>{{message.text}}</p>
       <span class="time-right">{{message.time}}</span>
     </div>
-    
+
   </div>
 </template>
 
@@ -49,14 +58,13 @@ export default {
       //isMessage: false,
       text: "",
       list: [],
-      
     };
   },
   watch: {
     text: function() {
       this.list = [];
       this.getSuggest();
-    }
+    },
   },
   computed: {
   // ...mapState("sugesstMessage", ["listSuggest"]),
@@ -73,32 +81,36 @@ export default {
       this.messages.push(m);
       this.text = "";
     },
+    appendText(word) {
+      let p = this.text.lastIndexOf(' ')
+      this.text = this.text.substring(0, p + 1) + word
+    },
     getSuggest: _.debounce(
       async function() {
         //console.log(1);
         if (this.text == ""){
           this.list = []
-          return 
+          return
         }
         if( _.endsWith(this.text,'.'))
-	      	{	
+	      	{
             this.list = [];
             return
           }
         var endPosition = Number(this.text.lastIndexOf('.'));
-        
+
         if (endPosition === -1 ) {
-        
+
           let textInput = {
             "sentence": this.text
           }
           let jsonObj = JSON.stringify(textInput)
-         
-          axios.post('http://192.168.0.109:8890/api', 
+
+          axios.post('http://192.168.0.109:8890/api',
             jsonObj
             )
             .then( res => {
-              let obj = res.data 
+              let obj = res.data
               this.list = obj.next
             }
             ).catch(err => {
@@ -109,22 +121,20 @@ export default {
         }
         else {
           textInput = this.text.slice(endPosition + 1);
-          
+
           axios.post('https://192.168.0.109:8890/api', textInput)
             .then( res => {
-              let obj = res.data 
+              let obj = res.data
               this.list = obj.next
             }
             ).catch(err => {
                 console.log(err)
               }
             );
-         
         }
-        
       },
       // Đây là thời gian (đơn vị mili giây) chúng ta đợi người dùng dừng gõ.
-      2500
+      25
     )
   },
   mounted() {
