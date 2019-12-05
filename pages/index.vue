@@ -36,7 +36,7 @@
 import Logo from "~/components/Logo.vue";
 import { mapState, mapActions } from "vuex";
 var _ = require('lodash');
-const axios = require('axios');
+import axios from 'axios';
 
 export default {
   components: {
@@ -59,11 +59,11 @@ export default {
     }
   },
   computed: {
-   ...mapState("sugesstMessage", ["listSuggest"]),
+  // ...mapState("sugesstMessage", ["listSuggest"]),
   },
 
   methods: {
-    ...mapActions("sugesstMessage", ["getSuggestM"]),
+    //...mapActions("sugesstMessage", ["getSuggestM"]),
     sendMessage() {
       let m = {};
       let date = Date();
@@ -75,8 +75,7 @@ export default {
     },
     getSuggest: _.debounce(
       async function() {
-        //
-        console.log(1);
+        //console.log(1);
         if (this.text == ""){
           this.list = []
           return 
@@ -95,23 +94,12 @@ export default {
           }
           let jsonObj = JSON.stringify(textInput)
          
-          
-          // const qs = require('qs');
-          // console.log(2,qs.stringify(textInput))
           axios.post('http://192.168.0.109:8890/api', 
             jsonObj
-            // ,
-            // {
-            //   headers: {
-            //       'Content-Type': 'application/x-www-form-urlencoded'
-            //   },
-            //   dataType: "json"
-            // }
             )
             .then( res => {
-              console.log("response")
-              console.log(res);
-              
+              let obj = res.data 
+              this.list = obj.next
             }
             ).catch(err => {
                 console.log("error")
@@ -122,10 +110,10 @@ export default {
         else {
           textInput = this.text.slice(endPosition + 1);
           
-          axios.post(`https://192.168.0.109:8890/api`, textInput)
+          axios.post('https://192.168.0.109:8890/api', textInput)
             .then( res => {
-              console.log(res);
-              this.list = res
+              let obj = res.data 
+              this.list = obj.next
             }
             ).catch(err => {
                 console.log(err)
@@ -136,7 +124,7 @@ export default {
         
       },
       // Đây là thời gian (đơn vị mili giây) chúng ta đợi người dùng dừng gõ.
-      3000
+      2500
     )
   },
   mounted() {

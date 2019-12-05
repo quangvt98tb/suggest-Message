@@ -33,24 +33,22 @@ module.exports = {
    */
   modules: [
     // Doc: https://bootstrap-vue.js.org/docs/
-    'bootstrap-vue/nuxt',
-    // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios'
+    'bootstrap-vue/nuxt'
   ],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {
-    proxy: 'true'
-  },
+  // axios: {
+  //   proxy: 'true'
+  // },
 
-  proxy: {
-    '/api/': {
-      target: process.env.API_ENDPOINT,
-      pathRewrite: { '^/api/': '' }
-    }
-  },
+  // proxy: {
+  //   '/api/': {
+  //     target: process.env.API_ENDPOINT,
+  //     pathRewrite: { '^/api/': '' }
+  //   }
+  // },
   /*
    ** Build configuration
    */
