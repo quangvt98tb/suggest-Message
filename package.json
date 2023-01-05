@@ -20,7 +20,7 @@
     "cross-env": "^5.2.0",
     "express": "^4.16.4",
     "lodash": "^4.17.15",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.15.8",
     "proxy": "^1.0.1",
     "vue-highlight-words": "^1.2.0",
     "vue-resize": "^0.4.5",
